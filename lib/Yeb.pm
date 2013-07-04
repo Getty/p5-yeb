@@ -42,7 +42,7 @@ sub import { shift; Yeb::Application->new(
   1;
 
   package MyApp::Web::Test;
-  use Yeb;
+  use MyApp::Web;
 
   r "/json" => sub {
     json {
