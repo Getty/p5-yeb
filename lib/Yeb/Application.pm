@@ -6,6 +6,7 @@ use Package::Stash;
 use Import::Into;
 use Yeb::Context;
 use Yeb::Class;
+use Class::Load ':all';
 
 use Web::Simple ();
 
@@ -16,6 +17,7 @@ has class => (
 
 has args => (
 	is => 'ro',
+	predicate => 1,
 );
 
 has config => (
@@ -39,12 +41,40 @@ sub y {
 	my ( $self, $yeb ) = @_;
 	$self->yebs->{$yeb};
 }
+sub y_main {
+	my ( $self ) = @_;
+	$self->yebs->{$self->class};
+}
 
 has functions => (
 	is => 'ro',
 	lazy => 1,
 	builder => sub {{}},
 );
+
+has plugins => (
+	is => 'ro',
+	lazy => 1,
+	builder => sub {[]},
+);
+
+sub add_plugin {
+	my ( $self, $source, $plugin, %args ) = @_;
+	my $class;
+	if ($plugin =~ m/^\+(.+)/) {
+		$class = $1;
+	} else {
+		$class = 'Yeb::Plugin::'.$plugin;
+	}
+	load_class($class);
+	my $obj = $class->new( app => $self, class => $self->y($source) , %args );
+	push @{$self->plugins}, $obj;
+}
+
+sub add_middleware {
+	my ( $self, $middleware ) = @_;
+	$self->y_main->prepend_to_chain( "" => sub { $middleware } );
+}
 
 sub BUILD {
 	my ( $self ) = @_;
@@ -58,13 +88,11 @@ sub BUILD {
 		$self->reset_context;
 		my $context = Yeb::Context->new( env => $env );
 		$self->current_context($context);
-		return $self->y($self->class)->chain,
+		return $self->y_main->chain,
 			'/...' => sub { $self->current_context->response };
 	});
 
 	$self->yeb_import($self->class);
-	
-	$self->yebs->{$self->class}->add_to_chain();
 
 	$self->package_stash->add_symbol('&import',sub {
 		my ( $class, $alias ) = @_;
@@ -84,6 +112,9 @@ sub yeb_import {
 		app => $self,
 		class => $target,
 	);
+	for (keys %{$self->functions}) {
+		$self->y($target)->add_function($_,$self->functions->{$_});
+	}
 }
 
 sub register_function {

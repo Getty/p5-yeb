@@ -1,18 +1,20 @@
 package WebTest;
 
 use Yeb;
-use Plack::Middleware::Session;
-use Plack::Session::Store::File;
 
-middleware(Plack::Middleware::Session->new(
-	store => Plack::Session::Store::File->new
-));
+BEGIN {
+	plugin 'Session';
+	plugin 'JSON';
+}
 
-route "/" => sub {
-	env->{'psgix.session'}->{x} = p('x');
-	text "root"
+r "/" => sub {
+	session->{x} = pa('x');
+	text "root";
 };
 
-route "/blub/..." => sub { chain 'Bla' };
+r "/blub/..." => sub {
+	st->{blub} = 1;
+	chain 'Bla';
+};
 
 1;

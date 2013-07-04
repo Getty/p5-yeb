@@ -1,5 +1,5 @@
 package Yeb::Class;
-# ABSTRACT: Meta Class for all Yeb Application classes
+# ABSTRACT: Meta Class for all Yeb application classes
 
 use Moo;
 use Package::Stash;
@@ -32,7 +32,7 @@ has chain_links => (
 );
 sub chain { @{shift->chain_links} }
 sub add_to_chain { push @{shift->chain_links}, @_ }
-sub pre_add_to_chain { unshift @{shift->chain_links}, @_ }
+sub prepend_to_chain { unshift @{shift->chain_links}, @_ }
 
 sub BUILD {
 	my ( $self ) = @_;
@@ -63,29 +63,33 @@ sub BUILD {
 		$self->app->current_context->request
 	});
 
-	$p->add_symbol('&s',sub {
+	$p->add_symbol('&plugin',sub {
+		$self->app->add_plugin($self->class,@_);
+	});
+
+	$p->add_symbol('&st',sub {
 		my $key = shift;
 		return $self->app->current_context->stash unless defined $key;
 		return $self->app->current_context->stash->{$key};
 	});
 
-	$p->add_symbol('&p',sub {
+	$p->add_symbol('&pa',sub {
 		my $value = $self->app->current_context->request->param(@_);
 		defined $value ? $value : "";
 	});
 
-	$p->add_symbol('&has_p',sub {
+	$p->add_symbol('&has_pa',sub {
 		my $value = $self->app->current_context->request->param(@_);
 		defined $value ? 1 : 0;
 	});
 
-	$p->add_symbol('&route',sub {
+	$p->add_symbol('&r',sub {
 		$self->add_to_chain(@_);
 	});
 
 	$p->add_symbol('&middleware',sub {
 		my $middleware = shift;
-		$self->add_to_chain( "" => sub { $middleware } );
+		$self->prepend_to_chain( "" => sub { $middleware } );
 	});
 
 	$p->add_symbol('&text',sub {

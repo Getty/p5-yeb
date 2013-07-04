@@ -2,12 +2,17 @@ package WebTest::Bla;
 
 use WebTest;
 
-route "/bla" => sub {
+r "/bla" => sub {
 	text "bla"
 };
 
-route "/x" => sub {
-	text " x = ".env->{'psgix.session'}->{x}
+r "/x/json" => sub {
+	st->{x}->{x} = session('x');
+	json;
+};
+
+r "/x" => sub {
+	text " x = ".session('x');
 };
 
 1;
