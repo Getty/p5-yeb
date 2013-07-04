@@ -35,7 +35,10 @@ has yebs => (
 	lazy => 1,
 	builder => sub {{}},
 );
-sub y { shift->yebs->{shift} }
+sub y {
+	my ( $self, $yeb ) = @_;
+	$self->yebs->{$yeb};
+}
 
 has functions => (
 	is => 'ro',
@@ -55,8 +58,7 @@ sub BUILD {
 		$self->reset_context;
 		my $context = Yeb::Context->new( env => $env );
 		$self->current_context($context);
-		my @chain = $self->yebs->{$self->class}->chain;
-		return $self->yebs->{$self->class}->chain,
+		return $self->y($self->class)->chain,
 			'/...' => sub { $self->current_context->response };
 	});
 
@@ -87,6 +89,12 @@ sub yeb_import {
 sub register_function {
 	my ( $self, $func, $coderef ) = @_;
 	die "Function ".$func." already defined" if defined $self->functions->{$func};
+	$self->functions->{$func} = $coderef;
+	for (keys %{$self->yebs}) {
+		$self->y($_)->add_function($func,$coderef);
+	}
 }
+
+
 
 1;

@@ -20,6 +20,10 @@ has package_stash => (
 	lazy => 1,
 	builder => sub { Package::Stash->new(shift->class) },
 );
+sub add_function {
+	my ( $self, $func, $coderef ) = @_;
+	$self->package_stash->add_symbol('&'.$func,$coderef);
+}
 
 has chain_links => (
 	is => 'ro',
@@ -28,6 +32,7 @@ has chain_links => (
 );
 sub chain { @{shift->chain_links} }
 sub add_to_chain { push @{shift->chain_links}, @_ }
+sub pre_add_to_chain { unshift @{shift->chain_links}, @_ }
 
 sub BUILD {
 	my ( $self ) = @_;
@@ -37,8 +42,13 @@ sub BUILD {
 
 	$p->add_symbol('&chain',sub {
 		my $class = shift;
+		if ($class =~ m/^\+/) {
+			$class =~ s/^(\+)//;
+		} else {
+			$class = $self->app->class.'::'.$class;
+		}
 		load_class($class) unless is_class_loaded($class);
-		return $self->app->yebs->{$class}->chain;
+		return $self->app->y($class)->chain;
 	});
 
 	$p->add_symbol('&cfg',sub {
@@ -53,18 +63,29 @@ sub BUILD {
 		$self->app->current_context->request
 	});
 
-	$p->add_symbol('&param',sub {
+	$p->add_symbol('&s',sub {
+		my $key = shift;
+		return $self->app->current_context->stash unless defined $key;
+		return $self->app->current_context->stash->{$key};
+	});
+
+	$p->add_symbol('&p',sub {
 		my $value = $self->app->current_context->request->param(@_);
 		defined $value ? $value : "";
 	});
 
-	$p->add_symbol('&has_param',sub {
+	$p->add_symbol('&has_p',sub {
 		my $value = $self->app->current_context->request->param(@_);
 		defined $value ? 1 : 0;
 	});
 
 	$p->add_symbol('&route',sub {
 		$self->add_to_chain(@_);
+	});
+
+	$p->add_symbol('&middleware',sub {
+		my $middleware = shift;
+		$self->add_to_chain( "" => sub { $middleware } );
 	});
 
 	$p->add_symbol('&text',sub {
