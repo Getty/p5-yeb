@@ -16,9 +16,9 @@ my $app = WebTest->new;
 my @tests = (
 	[ '', 'root' ],
 	[ 'nomistadontshoot', qr/i am out of here/, 500 ],
-	[ 'blub/', qr/i am out of here/, 500 ],
-	[ 'blub/bla', 'blubbla' ],
-	[ 'bleh/bla', 'blehbla' ],
+	[ 'a/', qr/i am out of here/, 500 ],
+	[ 'a/bla', 'export a stash a single b a single c a bla' ],
+	[ 'b/bla', 'export b stash b single a b single c b bla' ],
 	[ 'images/notfound', undef, 404 ],
 	[ 'images/test.jpg', path($Bin,'htdocs','images','test.jpg')->slurp, 200 ],
 	[ 'robots.txt', 'robots.txt' ],

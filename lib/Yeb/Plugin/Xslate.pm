@@ -4,8 +4,10 @@ package Yeb::Plugin::Xslate;
 use Moo;
 use Carp;
 use Text::Xslate;
+use Hash::Merge qw( merge );
 
 has app => ( is => 'ro', required => 1 );
+has class => ( is => 'ro', required => 1 );
 
 has path => ( is => 'ro', lazy => 1, builder => sub {[]} );
 has function => ( is => 'ro', lazy => 1, builder => sub {{}} );
@@ -65,7 +67,9 @@ has all_functions => (
 	builder => sub {
 		my ( $self ) = @_;
 		return {
-			%{$self->base_functions},
+			%{$self->app->yeb_functions},
+			%{$self->class->yeb_class_functions},
+			%{$self->app->functions},
 			%{$self->function}
 		}
 	},
@@ -77,10 +81,6 @@ has base_functions => (
 	builder => sub {
 		my ( $self ) = @_;
 		return {
-			yeb => sub { $self->app },
-			app => sub { $self->app },
-			cc => sub { $self->app->cc },
-			current_context => sub { $self->app->cc },
 			current_file => sub { $self->xslate->current_file },
 			current_line => sub { $self->xslate->current_line },
 			call => sub {
@@ -96,24 +96,29 @@ has base_functions => (
 				$source =~ s/$from/$to/g;
 				return $source;
 			},
-			pa => sub {
-				my $value = $self->app->cc->request->param(@_);
-				defined $value ? $value : "";
-			},
-			req => sub { $self->app->cc->request },
-			env => sub { $self->app->cc->env },
 		}
 	},
 );
 
+sub merge_hashs {
+	my ( $self, @hashs ) = @_;
+	my $first = pop @hashs;
+	while (@hashs) {
+		my $next = pop @hashs;
+		$first = merge($first,$next);
+	}
+	return $first;
+}
+
 sub get_vars {
 	my ( $self, $user_vars ) = @_;
 	my %stash = %{$self->app->cc->stash};
-	my %user_vars = defined $user_vars ? %{$user_vars} : ();
-	return {
-		%stash,
-		%user_vars,
-	};
+	my %user = defined $user_vars ? %{$user_vars} : ();
+	return $self->merge_hashs(
+		$self->app->cc->export,
+		$self->app->cc->stash,
+		\%user
+	);
 }
 
 sub BUILD {

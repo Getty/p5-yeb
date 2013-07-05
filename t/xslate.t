@@ -26,7 +26,7 @@ SKIP: {
 		[ '', qr!index page_include\[page\[root\]\]! ],
 		[ 'test', qr!index/test page_include\[page\[test\]\]! ],
 		[ 'images/notfound', undef, 404 ],
-		[ 'images/test.jpg', path($Bin,'htdocs','images','test.jpg')->slurp, 200 ],
+		#[ 'images/test.jpg', path($Bin,'htdocs','images','test.jpg')->slurp, 200 ],
 		[ 'robots.txt', 'robots.txt' ],
 		[ 'js/test.js', 'js/test.js' ],
 		[ 'subdir/test.js', 'subdir/test.js' ],

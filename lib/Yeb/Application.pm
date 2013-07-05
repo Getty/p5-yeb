@@ -9,6 +9,7 @@ use Yeb::Class;
 use Class::Load ':all';
 use Path::Tiny qw( path );
 use Plack::Middleware::Debug;
+use List::Util qw( reduce );
 
 use Web::Simple ();
 
@@ -81,6 +82,90 @@ has plugins => (
 	lazy => 1,
 	builder => sub {[]},
 );
+
+has yeb_functions => (
+	is => 'ro',
+	lazy => 1,
+	builder => sub {
+		my ( $self ) = @_;
+		{
+			yeb => sub { $self },
+
+			chain => sub {
+				my $class = $self->class_loader(shift);
+				$self->y($class)->chain;
+			},
+			load => sub {
+				my $class = $self->class_loader(shift);
+			},
+
+			cfg => sub { $self->config },
+			root => sub { path($self->root,@_) },
+			cur => sub { path($self->current_dir,@_) },
+
+			cc => sub { $self->cc },
+			env => sub { $self->cc->env },
+			req => sub { $self->cc->req },
+			st => sub { $self->hash_accessor($self->cc->stash,@_) },
+			ex => sub { $self->hash_accessor($self->cc->export,@_) },
+			pa => sub { $self->hash_accessor_empty($self->cc->request->params,@_) },
+			has_pa => sub { $self->hash_accessor_has($self->cc->request->params,@_) },
+
+			text => sub {
+				$self->cc->content_type('text/plain');
+				$self->cc->body(@_);
+				$self->cc->response;
+			},
+
+			html_body => sub {
+				$self->cc->content_type('text/html');
+				$self->cc->body('<html><body>'.@_.'</body></html>');
+				$self->cc->response;
+			},
+		}
+	},
+);
+
+sub class_loader {
+	my ( $self, $class ) = @_;
+	if ($class =~ m/^\+/) {
+		$class =~ s/^(\+)//;
+	} else {
+		$class = $self->class.'::'.$class;
+	}
+	load_class($class) unless is_class_loaded($class);
+	return $class;
+}
+
+sub hash_accessor_empty {
+	my ( $self, @hash_and_args ) = @_;
+	my $value = $self->hash_accessor(@hash_and_args);
+	return defined $value ? $value : "";
+}
+
+sub hash_accessor_has {
+	my ( $self, @hash_and_args ) = @_;
+	my $value = $self->hash_accessor(@hash_and_args);
+	return defined $value ? 1 : "";
+}
+
+sub hash_accessor {
+	my ( $self, $hash, $key, $value ) = @_;
+	return $hash unless defined $key;
+	my @args = ref $key eq 'ARRAY' ? @{$key} : ($key);
+	my $last_key = shift @args;
+	my $last;
+	if (@args) {
+		$last = reduce { $a->{$b}||={} } ($hash, @args);
+	} else {
+		$last = $hash;
+	}
+	if (defined $value) {
+		return $last->{$last_key} = $value;
+	} else {
+		return $last->{$last_key};
+	}
+}
 
 sub add_plugin {
 	my ( $self, $source, $plugin, %args ) = @_;

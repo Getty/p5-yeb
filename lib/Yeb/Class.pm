@@ -35,92 +35,33 @@ sub chain { @{shift->chain_links} }
 sub add_to_chain { push @{shift->chain_links}, @_ }
 sub prepend_to_chain { unshift @{shift->chain_links}, @_ }
 
+has yeb_class_functions => (
+	is => 'ro',
+	lazy => 1,
+	builder => sub {
+		my ( $self ) = @_;
+		{
+			plugin => sub { $self->app->add_plugin($self->class,@_) },
+
+			r => sub { $self->add_to_chain(@_) },
+			middleware => sub {
+				my $middleware = shift;
+				$self->prepend_to_chain( "" => sub { $middleware } );
+			}
+		}
+	},
+);
+
 sub BUILD {
 	my ( $self ) = @_;
 
-	$self->add_function('yeb',sub { $self->app });
+	for (keys %{$self->app->yeb_functions}) {
+		$self->add_function($_,$self->app->yeb_functions->{$_});
+	}
 
-	$self->add_function('chain',sub {
-		my $class = shift;
-		if ($class =~ m/^\+/) {
-			$class =~ s/^(\+)//;
-		} else {
-			$class = $self->app->class.'::'.$class;
-		}
-		load_class($class) unless is_class_loaded($class);
-		return $self->app->y($class)->chain;
-	});
-
-	$self->add_function('load',sub {
-		my $class = shift;
-		if ($class =~ m/^\+/) {
-			$class =~ s/^(\+)//;
-		} else {
-			$class = $self->app->class.'::'.$class;
-		}
-		load_class($class) unless is_class_loaded($class);
-		return $class;
-	});
-
-	$self->add_function('cfg',sub {
-		$self->app->config
-	});
-
-	$self->add_function('cc',sub {
-		$self->app->cc
-	});
-
-	$self->add_function('env',sub {
-		$self->app->cc->env
-	});
-
-	$self->add_function('req',sub {
-		$self->app->cc->request
-	});
-
-	$self->add_function('root',sub {
-		path($self->app->root,@_);
-	});
-
-	$self->add_function('cur',sub {
-		path($self->app->current_dir,@_);
-	});
-
-	$self->add_function('plugin',sub {
-		$self->app->add_plugin($self->class,@_);
-	});
-
-	$self->add_function('st',sub {
-		my $key = shift;
-		return $self->app->cc->stash unless defined $key;
-		return $self->app->cc->stash->{$key};
-	});
-
-	$self->add_function('pa',sub {
-		my $value = $self->app->cc->request->param(@_);
-		defined $value ? $value : "";
-	});
-
-	$self->add_function('has_pa',sub {
-		my $value = $self->app->cc->request->param(@_);
-		defined $value ? 1 : 0;
-	});
-
-	$self->add_function('r',sub {
-		$self->add_to_chain(@_);
-	});
-
-	$self->add_function('middleware',sub {
-		my $middleware = shift;
-		$self->prepend_to_chain( "" => sub { $middleware } );
-	});
-
-	$self->add_function('text',sub {
-		$self->app->cc->content_type('text/plain');
-		$self->app->cc->body(@_);
-		$self->app->cc->response;
-	});
-
+	for (keys %{$self->yeb_class_functions}) {
+		$self->add_function($_,$self->yeb_class_functions->{$_});
+	}
 }
 
 1;

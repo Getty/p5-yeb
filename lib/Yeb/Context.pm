@@ -15,6 +15,12 @@ has stash => (
 	builder => sub {{}},
 );
 
+has export => (
+	is => 'ro',
+	lazy => 1,
+	builder => sub {{}},
+);
+
 has header => (
 	is => 'ro',
 	lazy => 1,

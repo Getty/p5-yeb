@@ -4,6 +4,7 @@ package Yeb::Plugin::Static;
 use Moo;
 use Path::Tiny qw( path );
 use Plack::Middleware::Static;
+use Carp;
 
 has app => ( is => 'ro', required => 1 );
 has class => ( is => 'ro', required => 1 );
@@ -25,11 +26,18 @@ has content_type => (
 	predicate => 1,
 );
 
+has default_root => (
+	is => 'ro',
+	predicate => 1,
+);
+
 sub add_middleware_static {
-	my ( $self, $from, $to, $pass_through, $content_type ) = @_;
+	my ( $self, $from, $root, $pass_through, $content_type ) = @_;
+	$root = $self->default_root if !defined $root and $self->has_default_root;
+	croak "Static needs a root directory for a static directory" unless defined $root;
 	unshift @{$self->middleware_statics}, Plack::Middleware::Static->new(
 		path => $from,
-		root => path($to)->absolute,
+		root => path($root)->absolute,
 		pass_through => $pass_through ? 1 : 0,
 		defined $content_type
 			? ( content_type => $content_type )
@@ -42,12 +50,12 @@ sub add_middleware_static {
 sub BUILD {
 	my ( $self ) = @_;
 	$self->app->register_function('static',sub {
-		my ( $from, $to, $content_type ) = @_;
-		$self->add_middleware_static($from,$to,1,$content_type);
+		my ( $from, $root, $content_type ) = @_;
+		$self->add_middleware_static($from,$root,1,$content_type);
 	});
 	$self->app->register_function('static_404',sub {
-		my ( $from, $to, $content_type ) = @_;
-		$self->add_middleware_static($from,$to,0,$content_type);
+		my ( $from, $root, $content_type ) = @_;
+		$self->add_middleware_static($from,$root,0,$content_type);
 	});
 	my $class = $self->local_static
 		? $self->class

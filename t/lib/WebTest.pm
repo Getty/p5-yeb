@@ -9,13 +9,19 @@ r "/" => sub {
 	text "root";
 };
 
-r "/blub/..." => sub {
-	st->{was} = 'blub';
+r "/a/..." => sub {
+	ex( [qw( x y )] => 'export a' );
+	st( [qw( y x )] => 'stash a' );
+	st( [qw( a )] => 'single b a' );
+	st( c => 'single c a' );
 	chain 'Bla';
 };
 
-r "/bleh/..." => sub {
-	st->{was} = 'bleh';
+r "/b/..." => sub {
+	ex( [qw( x y )] => 'export b' );
+	st( [qw( y x )] => 'stash b' );
+	st( [qw( a )] => 'single a b' );
+	st( c => 'single c b' );
 	chain 'Bla';
 };
 

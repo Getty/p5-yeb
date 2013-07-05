@@ -167,6 +167,10 @@ Make a simple B<text/plain> response with the text given as parameter
 
 Session management via L<Plack::Middleware::Session>
 
+=item L<Yeb::Plugin::Static>
+
+Static files via L<Plack::Middleware::Static>
+
 =item L<Yeb::Plugin::Xslate>
 
 Template output via L<Text::Xslate>
