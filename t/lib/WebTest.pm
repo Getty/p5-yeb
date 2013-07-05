@@ -2,6 +2,9 @@ package WebTest;
 
 use Yeb;
 
+plugin 'Static';
+load 'Static';
+
 r "/" => sub {
 	text "root";
 };

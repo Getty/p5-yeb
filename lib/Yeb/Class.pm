@@ -51,6 +51,17 @@ sub BUILD {
 		return $self->app->y($class)->chain;
 	});
 
+	$self->add_function('load',sub {
+		my $class = shift;
+		if ($class =~ m/^\+/) {
+			$class =~ s/^(\+)//;
+		} else {
+			$class = $self->app->class.'::'.$class;
+		}
+		load_class($class) unless is_class_loaded($class);
+		return $class;
+	});
+
 	$self->add_function('cfg',sub {
 		$self->app->config
 	});
