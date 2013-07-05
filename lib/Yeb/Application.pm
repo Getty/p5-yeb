@@ -14,9 +14,20 @@ use Hash::Merge qw( merge );
 
 use Web::Simple ();
 
+my $first_yep_application;
+
 has class => (
 	is => 'ro',
 	required => 1,
+);
+
+has first => (
+	is => 'ro',
+	lazy => 1,
+	builder => sub {
+		my ( $self ) = @_;
+		$first_yep_application->class eq $self->class ? 1 : 0;
+	},
 );
 
 has args => (
@@ -49,7 +60,11 @@ has current_dir => (
 has debug => (
 	is => 'ro',
 	lazy => 1,
-	builder => sub { $ENV{YEB_TRACE} || $ENV{YEB_DEBUG} ? 1 : 0 },
+	builder => sub {
+		my ( $self ) = @_;
+		return 0 unless $self->first;
+		return $ENV{YEB_TRACE} || $ENV{YEB_DEBUG} ? 1 : 0;
+	},
 );
 
 has package_stash => (
@@ -198,6 +213,8 @@ sub merge_hashs {
 
 sub BUILD {
 	my ( $self ) = @_;
+
+	$first_yep_application = $self unless defined $first_yep_application;
 
 	$self->root;
 	$self->current_dir;

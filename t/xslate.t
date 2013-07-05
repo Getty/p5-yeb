@@ -39,6 +39,7 @@ SKIP: {
 	for (@tests) {
 		my $path = $_->[0];
 		my $url = "http://localhost/".$path;
+		note($url);
 		my $test = $_->[1];
 		my $code = defined $_->[2] ? $_->[2] : 200;
 		ok(my $res = $app->run_test_request( GET => $url ), 'response on /'.$path);

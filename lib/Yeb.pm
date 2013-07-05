@@ -6,10 +6,13 @@ use warnings;
 
 use Yeb::Application;
 
-sub import { shift; Yeb::Application->new(
-	class => caller,
-	@_ ? ( args => [@_] ) : (),
-)}
+sub import { shift;
+  my ( $caller ) = caller;
+  Yeb::Application->new(
+    class => $caller,
+    @_ ? ( args => [@_] ) : (),
+  );
+}
 
 1;
 
@@ -37,6 +40,10 @@ sub import { shift; Yeb::Application->new(
   r "/test/..." => sub {
     st stash_var => 1;
     chain 'Test';
+  };
+
+  r "/blog/..." => sub {
+    chain '+SomeOther::YebApp';
   };
 
   1;

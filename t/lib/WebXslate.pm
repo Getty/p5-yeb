@@ -1,5 +1,7 @@
 package WebXslate;
 
+use strictures;
+
 use Yeb;
 
 BEGIN {
