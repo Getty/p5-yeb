@@ -10,6 +10,7 @@ use Class::Load ':all';
 use Path::Tiny qw( path );
 use Plack::Middleware::Debug;
 use List::Util qw( reduce );
+use Hash::Merge qw( merge );
 
 use Web::Simple ();
 
@@ -109,7 +110,7 @@ has yeb_functions => (
 			st => sub { $self->hash_accessor($self->cc->stash,@_) },
 			ex => sub { $self->hash_accessor($self->cc->export,@_) },
 			pa => sub { $self->hash_accessor_empty($self->cc->request->params,@_) },
-			has_pa => sub { $self->hash_accessor_has($self->cc->request->params,@_) },
+			pa_has => sub { $self->hash_accessor_has($self->cc->request->params,@_) },
 
 			text => sub {
 				$self->cc->content_type('text/plain');
@@ -183,6 +184,16 @@ sub add_plugin {
 sub add_middleware {
 	my ( $self, $middleware ) = @_;
 	$self->y_main->prepend_to_chain( "" => sub { $middleware } );
+}
+
+sub merge_hashs {
+	my ( $self, @hashs ) = @_;
+	my $first = pop @hashs;
+	while (@hashs) {
+		my $next = pop @hashs;
+		$first = merge($first,$next);
+	}
+	return $first;
 }
 
 sub BUILD {

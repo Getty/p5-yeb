@@ -67,6 +67,29 @@ sub BUILD {
 
 1;
 
+=encoding utf8
+
+=head1 SYNOPSIS
+
+  package MyYeb;
+
+  use Yeb;
+
+  BEGIN {
+    plugin 'Static', default_root => root('htdocs');
+  }
+
+  static qr{^/};
+  static_404 qr{^/images/}, root('htdocs');
+
+  1;
+
+=head1 FRAMEWORK FUNCTIONS
+
+=head2 static
+
+=head2 static_404
+
 =head1 SUPPORT
 
 IRC

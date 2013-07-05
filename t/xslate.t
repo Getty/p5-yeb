@@ -16,6 +16,8 @@ SKIP: {
 
 	skip "Text::Xslate, JSON or Plack::Middleware::Session is not installed", 1 if $@;
 
+	JSON->import;
+
 	$ENV{YEB_ROOT} = $Bin;
 
 	use_ok('WebXslate');
@@ -31,6 +33,7 @@ SKIP: {
 		[ 'js/test.js', 'js/test.js' ],
 		[ 'subdir/test.js', 'subdir/test.js' ],
 		[ 'no_default_handler_error', qr/i am out of here/, 500 ],
+		[ 'json', { key => 'value', other_key => 'value' } ],
 	);
 
 	for (@tests) {
@@ -40,10 +43,14 @@ SKIP: {
 		my $code = defined $_->[2] ? $_->[2] : 200;
 		ok(my $res = $app->run_test_request( GET => $url ), 'response on /'.$path);
 		cmp_ok($res->code, '==', $code, 'Status '.$code.' on /'.$path);
+		my $ctn = 'Expected content on /'.$path;
 		if (ref $test eq 'Regexp') {
-			like($res->content, $test, 'Expected content on /'.$path);
+			like($res->content, $test, $ctn);
+		} elsif (ref $test eq 'HASH') {
+			my $data = from_json($res->content);
+			is_deeply($data,$test, $ctn);
 		} elsif (defined $test) {
-			cmp_ok($res->content, 'eq', $test, 'Expected content on /'.$path);
+			cmp_ok($res->content, 'eq', $test, $ctn);
 		}
 	}
 }

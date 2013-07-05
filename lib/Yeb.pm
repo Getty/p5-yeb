@@ -26,7 +26,7 @@ sub import { shift; Yeb::Application->new(
   }
 
   r "/" => sub {
-    session->{test} = pa('test');
+    session test => pa('test');
     text "root";
   };
 
@@ -35,7 +35,7 @@ sub import { shift; Yeb::Application->new(
   };
 
   r "/test/..." => sub {
-    st->{stash_var} = 1;
+    st stash_var => 1;
     chain 'Test';
   };
 
@@ -46,13 +46,13 @@ sub import { shift; Yeb::Application->new(
 
   r "/json" => sub {
     json {
-      test => session->{test},
-      stash_var => st->{stash_var},
+      test => session('test'),
+      stash_var => st('stash_var'),
     }
   };
 
   r "/" => sub {
-    text " test = ".session->{test}." and blub is ".st->{stash_var};
+    text " test = ".session('test')." and blub is ".st('stash_var');
   };
 
   1;
@@ -71,16 +71,16 @@ Or a L<Text::Xslate> example:
     plugin 'Session';
     plugin 'JSON';
     plugin 'Xslate';
-    plugin 'Static';
+    plugin 'Static', default_root => root('htdocs');
   }
 
   xslate_path root('templates');
 
-  static qr{^/}, root('htdocs');
-  static_404 qr{^/images/}, root('htdocs');
+  static qr{^/};
+  static_404 qr{^/images/}, root('htdocs_images');
 
   r "/" => sub {
-    st->{page} = 'root';
+    st page => 'root';
     xslate 'index';
   };
 
@@ -143,7 +143,7 @@ Access to the stash hash
 
 Access to the request parameters, gives back "" if is not set
 
-=head2 has_pa
+=head2 pa_has
 
 Check if some parameter is at all set
 
@@ -177,7 +177,7 @@ Template output via L<Text::Xslate>
 
 =item L<Yeb::Plugin::JSON>
 
-JSON Output via L<JSON>
+JSON output via L<JSON>
 
 =back
 
