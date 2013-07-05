@@ -8,6 +8,12 @@ yeb
 
 version 0.003
 
+=head1 SUPPORT
+
+IRC
+
+  Join #web-simple on irc.perl.org. Highlight Getty for fast reaction :).
+  
 =head1 AUTHOR
 
 Torsten Raudssus <torsten@raudss.us>
