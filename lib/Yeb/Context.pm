@@ -36,7 +36,7 @@ has status => (
 has body => (
 	is => 'rw',
 	lazy => 1,
-	builder => sub { die "i am out of here" },
+	builder => sub { "Nothing todo, i am out of here" },
 );
 
 has content_type => (

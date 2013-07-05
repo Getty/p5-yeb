@@ -22,13 +22,30 @@ SKIP: {
 
 	my $app = WebXslate->new;
 
-	ok(my $root = $app->run_test_request( GET => "http://localhost/" ), 'response on /');
-	cmp_ok($root->code, '==', 200, 'Status 200 on /');
-	cmp_ok($root->content, 'eq', 'index page_include[page[root]]', 'Expected content on /');
+	my @tests = (
+		[ '', qr!index page_include\[page\[root\]\]! ],
+		[ 'test', qr!index/test page_include\[page\[test\]\]! ],
+		[ 'images/notfound', undef, 404 ],
+		[ 'images/test.jpg', path($Bin,'htdocs','images','test.jpg')->slurp, 200 ],
+		[ 'robots.txt', 'robots.txt' ],
+		[ 'js/test.js', 'js/test.js' ],
+		[ 'subdir/test.js', 'subdir/test.js' ],
+		[ 'no_default_handler_error', qr/i am out of here/, 500 ],
+	);
 
-	ok(my $test = $app->run_test_request( GET => "http://localhost/test" ), 'response on /test');
-	cmp_ok($test->code, '==', 200, 'Status 200 on /test');
-	cmp_ok($test->content, 'eq', 'index/test page_include[page[test]]', 'Expected content on /test');
+	for (@tests) {
+		my $path = $_->[0];
+		my $url = "http://localhost/".$path;
+		my $test = $_->[1];
+		my $code = defined $_->[2] ? $_->[2] : 200;
+		ok(my $res = $app->run_test_request( GET => $url ), 'response on /'.$path);
+		cmp_ok($res->code, '==', $code, 'Status '.$code.' on /'.$path);
+		if (ref $test eq 'Regexp') {
+			like($res->content, $test, 'Expected content on /'.$path);
+		} elsif (defined $test) {
+			cmp_ok($res->content, 'eq', $test, 'Expected content on /'.$path);
+		}
+	}
 }
 
 

@@ -71,9 +71,13 @@ Or a L<Text::Xslate> example:
     plugin 'Session';
     plugin 'JSON';
     plugin 'Xslate';
+    plugin 'Static';
   }
 
   xslate_path root('templates');
+
+  static qr{^/}, root('htdocs');
+  static_404 qr{^/images/}, root('htdocs');
 
   r "/" => sub {
     st->{page} = 'root';
@@ -88,6 +92,11 @@ Or a L<Text::Xslate> example:
   1;
 
 =head1 DESCRIPTION
+
+=head1 PLUGINS
+
+For an example on how to make a simple plugin, which adds a new function and
+uses a L<Plack::Middleware>, please see the source of L<Yeb::Plugin::Session>.
 
 =head1 FRAMEWORK FUNCTIONS
 
@@ -152,11 +161,21 @@ Make a simple B<text/plain> response with the text given as parameter
 
 =head1 SEE ALSO
 
- * L<Yeb::Plugin::Session>
+=over 4
 
- * L<Yeb::Plugin::Xslate>
+=item L<Yeb::Plugin::Session>
 
- * L<Yeb::Plugin::JSON>
+Session management via L<Plack::Middleware::Session>
+
+=item L<Yeb::Plugin::Xslate>
+
+Template output via L<Text::Xslate>
+
+=item L<Yeb::Plugin::JSON>
+
+JSON Output via L<JSON>
+
+=back
 
 =head1 SUPPORT
 
