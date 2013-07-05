@@ -21,9 +21,9 @@ sub BUILD {
 	$self->app->register_function('json',sub {
 		my $user_vars = shift;
 		my $vars = $self->get_vars($user_vars);
-		$self->app->current_context->content_type('application/json');
-		$self->app->current_context->body(to_json($vars,@_));
-		$self->app->current_context->response;
+		$self->app->cc->content_type('application/json');
+		$self->app->cc->body(to_json($vars,@_));
+		$self->app->cc->response;
 	});
 }
 

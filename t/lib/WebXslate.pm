@@ -25,8 +25,13 @@ r "/test" => sub {
 };
 
 r "/json" => sub {
-  ex key => 'value';
-  json { other_key => 'value' };
+	ex key => 'value';
+	json { other_key => 'value' };
+};
+
+r "/other/..." => sub {
+	ex other_app => 'other';
+	chain '+OtherWebTest';
 };
 
 1;

@@ -94,7 +94,7 @@ has yeb_functions => (
 
 			chain => sub {
 				my $class = $self->class_loader(shift);
-				$self->y($class)->chain;
+				$class->yeb->y($class)->chain;
 			},
 			load => sub {
 				my $class = $self->class_loader(shift);
@@ -209,8 +209,7 @@ sub BUILD {
 	$self->package_stash->add_symbol('&dispatch_request',sub {
 		my ( undef, $env ) = @_;
 		$self->reset_context;
-		my $context = Yeb::Context->new( env => $env );
-		$self->cc($context);
+		$self->set_cc(Yeb::Context->new( env => $env ));
 		return $self->y_main->chain,
 			'/...' => sub {
 				$self->cc->status(500);
@@ -229,12 +228,13 @@ sub BUILD {
 	if ($self->debug) {
 		$self->add_middleware(Plack::Middleware::Debug->new);
 	}
+	my $funcs = [$self->package_stash->list_all_symbols];
 }
 
-has cc => (
-	is => 'rw',
-	clearer => 'reset_context',
-);
+my $cc;
+sub set_cc { shift; $cc = shift; }
+sub cc { $cc }
+sub reset_context { $cc = undef }
 sub current_context { shift->cc }
 
 sub yeb_import {
