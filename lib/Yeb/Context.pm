@@ -37,18 +37,21 @@ has status => (
 	is => 'rw',
 	lazy => 1,
 	builder => sub { 200 },
+	predicate => 1,
 );
 
 has body => (
 	is => 'rw',
 	lazy => 1,
 	builder => sub { "Nothing todo, i am out of here" },
+	predicate => 1,
 );
 
 has content_type => (
 	is => 'rw',
 	lazy => 1,
 	builder => sub { "text/html" },
+	predicate => 1,
 );
 
 sub response {

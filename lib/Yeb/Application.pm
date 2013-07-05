@@ -245,7 +245,6 @@ sub BUILD {
 	if ($self->debug) {
 		$self->add_middleware(Plack::Middleware::Debug->new);
 	}
-	my $funcs = [$self->package_stash->list_all_symbols];
 }
 
 my $cc;
