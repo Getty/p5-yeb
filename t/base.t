@@ -2,8 +2,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Plack::Test;
-use HTTP::Request;
 
 use FindBin qw($Bin);
 use lib "$Bin/lib";
@@ -20,8 +18,12 @@ ok(my $blub = $app->run_test_request( GET => "http://localhost/blub/" ), 'respon
 cmp_ok($blub->code, '==', 500, 'Status 500 on /blub/');
 like($blub->content, qr/i am out of here/, 'Expected error on /blub/');
 
-ok(my $bla = $app->run_test_request( GET => "http://localhost/blub/bla" ), 'response on /blub/bla');
-cmp_ok($bla->code, '==', 200, 'Status 200 on /blub/bla');
-cmp_ok($bla->content, 'eq', 'bla', 'Expected content on /blub/bla');
+ok(my $blubbla = $app->run_test_request( GET => "http://localhost/blub/bla" ), 'response on /blub/bla');
+cmp_ok($blubbla->code, '==', 200, 'Status 200 on /blub/bla');
+cmp_ok($blubbla->content, 'eq', 'blubbla', 'Expected content on /blub/bla');
+
+ok(my $blehbla = $app->run_test_request( GET => "http://localhost/bleh/bla" ), 'response on /bleh/bla');
+cmp_ok($blehbla->code, '==', 200, 'Status 200 on /bleh/bla');
+cmp_ok($blehbla->content, 'eq', 'blehbla', 'Expected content on /bleh/bla');
 
 done_testing;

@@ -4,6 +4,7 @@ package Yeb::Class;
 use Moo;
 use Package::Stash;
 use Class::Load ':all';
+use Path::Tiny;
 
 has app => (
 	is => 'ro',
@@ -55,12 +56,20 @@ sub BUILD {
 		$self->app->config
 	});
 
+	$p->add_symbol('&cc',sub {
+		$self->app->cc
+	});
+
 	$p->add_symbol('&env',sub {
-		$self->app->current_context->env
+		$self->app->cc->env
 	});
 
 	$p->add_symbol('&req',sub {
-		$self->app->current_context->request
+		$self->app->cc->request
+	});
+
+	$p->add_symbol('&root',sub {
+		path($self->app->root,@_);
 	});
 
 	$p->add_symbol('&plugin',sub {
@@ -69,17 +78,17 @@ sub BUILD {
 
 	$p->add_symbol('&st',sub {
 		my $key = shift;
-		return $self->app->current_context->stash unless defined $key;
-		return $self->app->current_context->stash->{$key};
+		return $self->app->cc->stash unless defined $key;
+		return $self->app->cc->stash->{$key};
 	});
 
 	$p->add_symbol('&pa',sub {
-		my $value = $self->app->current_context->request->param(@_);
+		my $value = $self->app->cc->request->param(@_);
 		defined $value ? $value : "";
 	});
 
 	$p->add_symbol('&has_pa',sub {
-		my $value = $self->app->current_context->request->param(@_);
+		my $value = $self->app->cc->request->param(@_);
 		defined $value ? 1 : 0;
 	});
 
@@ -93,9 +102,9 @@ sub BUILD {
 	});
 
 	$p->add_symbol('&text',sub {
-		$self->app->current_context->content_type('text/plain');
-		$self->app->current_context->body(@_);
-		$self->app->current_context->response;
+		$self->app->cc->content_type('text/plain');
+		$self->app->cc->body(@_);
+		$self->app->cc->response;
 	});
 
 }

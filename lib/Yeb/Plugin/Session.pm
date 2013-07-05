@@ -13,8 +13,8 @@ sub BUILD {
 	));
 	$self->app->register_function('session',sub {
 		my $key = shift;
-		return $self->app->current_context->env->{'psgix.session'} unless defined $key;
-		return $self->app->current_context->env->{'psgix.session'}->{$key};
+		return $self->app->cc->env->{'psgix.session'} unless defined $key;
+		return $self->app->cc->env->{'psgix.session'}->{$key};
 	});
 }
 

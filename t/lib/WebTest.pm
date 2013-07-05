@@ -2,18 +2,17 @@ package WebTest;
 
 use Yeb;
 
-BEGIN {
-	plugin 'Session';
-	plugin 'JSON';
-}
-
 r "/" => sub {
-	session->{x} = pa('x');
 	text "root";
 };
 
 r "/blub/..." => sub {
-	st->{blub} = 1;
+	st->{was} = 'blub';
+	chain 'Bla';
+};
+
+r "/bleh/..." => sub {
+	st->{was} = 'bleh';
 	chain 'Bla';
 };
 

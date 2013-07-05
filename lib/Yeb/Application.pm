@@ -7,6 +7,8 @@ use Import::Into;
 use Yeb::Context;
 use Yeb::Class;
 use Class::Load ':all';
+use Path::Tiny;
+use Plack::Middleware::Debug;
 
 use Web::Simple ();
 
@@ -24,6 +26,18 @@ has config => (
 	is => 'ro',
 	lazy => 1,
 	builder => sub {{}},
+);
+
+has root => (
+	is => 'ro',
+	lazy => 1,
+	builder => sub { defined $ENV{YEB_ROOT} ? $ENV{YEB_ROOT} : path(".") },
+);
+
+has debug => (
+	is => 'ro',
+	lazy => 1,
+	builder => sub { $ENV{YEB_TRACE} || $ENV{YEB_DEBUG} ? 1 : 0 },
 );
 
 has package_stash => (
@@ -87,9 +101,9 @@ sub BUILD {
 		my ( undef, $env ) = @_;
 		$self->reset_context;
 		my $context = Yeb::Context->new( env => $env );
-		$self->current_context($context);
+		$self->cc($context);
 		return $self->y_main->chain,
-			'/...' => sub { $self->current_context->response };
+			'/...' => sub { $self->cc->response };
 	});
 
 	$self->yeb_import($self->class);
@@ -99,12 +113,17 @@ sub BUILD {
 		my $target = caller;
 		$self->yeb_import($target, $alias);
 	});
+
+	if ($self->debug) {
+		$self->add_middleware(Plack::Middleware::Debug->new);
+	}
 }
 
-has current_context => (
+has cc => (
 	is => 'rw',
 	clearer => 'reset_context',
 );
+sub current_context { shift->cc }
 
 sub yeb_import {
 	my ( $self, $target ) = @_;

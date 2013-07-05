@@ -31,11 +31,11 @@ sub import { shift; Yeb::Application->new(
   };
 
   r "/blub" => sub {
-    st->{blub} = 1;
-    text "root";
+    text "blub";
   };
 
   r "/test/..." => sub {
+    st->{stash_var} = 1;
     chain 'Test';
   };
 
@@ -47,12 +47,12 @@ sub import { shift; Yeb::Application->new(
   r "/json" => sub {
     json {
       test => session->{test},
-      blub => st->{blub} ? 1 : 0,
+      stash_var => st->{stash_var},
     }
   };
 
   r "/" => sub {
-    text " test = ".session->{test}." and blub is ".st->{blub} ? 1 : 0;
+    text " test = ".session->{test}." and blub is ".st->{stash_var};
   };
 
   1;
@@ -60,6 +60,32 @@ sub import { shift; Yeb::Application->new(
 Can then be started like (see L<Web::Simple>):
 
   plackup -MMyApp::Web -e'MyApp::Web->run_if_script'
+
+Or a L<Text::Xslate> example:
+
+  package MyApp::WebXslate;
+
+  use Yeb;
+
+  BEGIN {
+    plugin 'Session';
+    plugin 'JSON';
+    plugin 'Xslate';
+  }
+
+  xslate_path root('templates');
+
+  r "/" => sub {
+    st->{page} = 'root';
+    xslate 'index';
+  };
+
+  r "/test" => sub {
+    st->{page} = 'test';
+    xslate 'index/test', { extra_var => 'extra' };
+  };
+
+  1;
 
 =head1 DESCRIPTION
 
