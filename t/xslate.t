@@ -16,9 +16,9 @@ SKIP: {
 
 	skip "Text::Xslate, JSON or Plack::Middleware::Session is not installed", 1 if $@;
 
-	use_ok('WebXslate');
+	$ENV{YEB_ROOT} = $Bin;
 
-	$ENV{YEB_ROOT} = path($Bin)->dirname;
+	use_ok('WebXslate');
 
 	my $app = WebXslate->new;
 

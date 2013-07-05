@@ -7,7 +7,7 @@ use Import::Into;
 use Yeb::Context;
 use Yeb::Class;
 use Class::Load ':all';
-use Path::Tiny;
+use Path::Tiny qw( path );
 use Plack::Middleware::Debug;
 
 use Web::Simple ();
@@ -31,7 +31,17 @@ has config => (
 has root => (
 	is => 'ro',
 	lazy => 1,
-	builder => sub { defined $ENV{YEB_ROOT} ? $ENV{YEB_ROOT} : path(".") },
+	builder => sub {
+		defined $ENV{YEB_ROOT}
+			? path($ENV{YEB_ROOT})
+			: path(".")
+	},
+);
+
+has current_dir => (
+	is => 'ro',
+	lazy => 1,
+	builder => sub { path(".") },
 );
 
 has debug => (
@@ -93,6 +103,9 @@ sub add_middleware {
 sub BUILD {
 	my ( $self ) = @_;
 
+	$self->root;
+	$self->current_dir;
+
 	$self->package_stash->add_symbol('$yeb',\$self);
 	
 	Web::Simple->import::into($self->class);
@@ -145,6 +158,21 @@ sub register_function {
 	}
 }
 
-
-
 1;
+
+=head1 SUPPORT
+
+IRC
+
+  Join #web-simple on irc.perl.org. Highlight Getty for fast reaction :).
+
+Repository
+
+  http://github.com/Getty/p5-yeb
+  Pull request and additional contributors are welcome
+ 
+Issue Tracker
+
+  http://github.com/Getty/p5-yeb/issues
+
+

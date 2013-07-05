@@ -89,7 +89,74 @@ Or a L<Text::Xslate> example:
 
 =head1 DESCRIPTION
 
-Just.... had to be done...
+=head1 FRAMEWORK FUNCTIONS
+
+=head2 yeb
+
+Gives back the L<Yeb::Application> of the web application
+
+=head2 chain
+
+Return another class dispatcher chain, will be prepend with your main class
+name, this can be deactivated by using a B<+> in front of the class name.
+
+=head2 cfg
+
+Access to the configuration hash
+
+=head2 cc
+
+Getting the current L<Yeb::Context> of the request
+
+=head2 env
+
+Getting the Plack environment
+
+=head2 req
+
+Getting the current L<Plack::Request>
+
+=head2 root
+
+Current directory or B<YEB_ROOT> environment variable
+
+=head2 cur
+
+Current directory in the moment of start
+
+=head2 plugin $yeb_plugin_name, { key => $value };
+
+=head2 st
+
+Access to the stash hash
+
+=head2 pa
+
+Access to the request parameters, gives back "" if is not set
+
+=head2 has_pa
+
+Check if some parameter is at all set
+
+=head2 r
+
+Adding a new dispatcher for this class (see L<Web::Simple>)
+
+=head2 middleware
+
+Adding a L<Plack::Middleware> to the flow
+
+=head2 text
+
+Make a simple B<text/plain> response with the text given as parameter
+
+=head1 SEE ALSO
+
+ * L<Yeb::Plugin::Session>
+
+ * L<Yeb::Plugin::Xslate>
+
+ * L<Yeb::Plugin::JSON>
 
 =head1 SUPPORT
 

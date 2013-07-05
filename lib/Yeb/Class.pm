@@ -4,7 +4,7 @@ package Yeb::Class;
 use Moo;
 use Package::Stash;
 use Class::Load ':all';
-use Path::Tiny;
+use Path::Tiny qw( path );
 
 has app => (
 	is => 'ro',
@@ -37,11 +37,10 @@ sub prepend_to_chain { unshift @{shift->chain_links}, @_ }
 
 sub BUILD {
 	my ( $self ) = @_;
-	my $p = $self->package_stash;
 
-	$p->add_symbol('&yeb',sub { $self->app });
+	$self->add_function('yeb',sub { $self->app });
 
-	$p->add_symbol('&chain',sub {
+	$self->add_function('chain',sub {
 		my $class = shift;
 		if ($class =~ m/^\+/) {
 			$class =~ s/^(\+)//;
@@ -52,56 +51,60 @@ sub BUILD {
 		return $self->app->y($class)->chain;
 	});
 
-	$p->add_symbol('&cfg',sub {
+	$self->add_function('cfg',sub {
 		$self->app->config
 	});
 
-	$p->add_symbol('&cc',sub {
+	$self->add_function('cc',sub {
 		$self->app->cc
 	});
 
-	$p->add_symbol('&env',sub {
+	$self->add_function('env',sub {
 		$self->app->cc->env
 	});
 
-	$p->add_symbol('&req',sub {
+	$self->add_function('req',sub {
 		$self->app->cc->request
 	});
 
-	$p->add_symbol('&root',sub {
+	$self->add_function('root',sub {
 		path($self->app->root,@_);
 	});
 
-	$p->add_symbol('&plugin',sub {
+	$self->add_function('cur',sub {
+		path($self->app->current_dir,@_);
+	});
+
+	$self->add_function('plugin',sub {
 		$self->app->add_plugin($self->class,@_);
 	});
 
-	$p->add_symbol('&st',sub {
+	$self->add_function('st',sub {
 		my $key = shift;
 		return $self->app->cc->stash unless defined $key;
 		return $self->app->cc->stash->{$key};
 	});
 
-	$p->add_symbol('&pa',sub {
+	$self->add_function('pa',sub {
 		my $value = $self->app->cc->request->param(@_);
 		defined $value ? $value : "";
 	});
 
-	$p->add_symbol('&has_pa',sub {
+	$self->add_function('has_pa',sub {
 		my $value = $self->app->cc->request->param(@_);
 		defined $value ? 1 : 0;
 	});
 
-	$p->add_symbol('&r',sub {
+	$self->add_function('r',sub {
 		$self->add_to_chain(@_);
 	});
 
-	$p->add_symbol('&middleware',sub {
+	$self->add_function('middleware',sub {
 		my $middleware = shift;
 		$self->prepend_to_chain( "" => sub { $middleware } );
 	});
 
-	$p->add_symbol('&text',sub {
+	$self->add_function('text',sub {
 		$self->app->cc->content_type('text/plain');
 		$self->app->cc->body(@_);
 		$self->app->cc->response;
@@ -110,3 +113,20 @@ sub BUILD {
 }
 
 1;
+
+=head1 SUPPORT
+
+IRC
+
+  Join #web-simple on irc.perl.org. Highlight Getty for fast reaction :).
+
+Repository
+
+  http://github.com/Getty/p5-yeb
+  Pull request and additional contributors are welcome
+ 
+Issue Tracker
+
+  http://github.com/Getty/p5-yeb/issues
+
+

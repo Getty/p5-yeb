@@ -1,4 +1,5 @@
 package Yeb::Plugin::JSON;
+# ABSTRACT: Yeb Plugin for JSON response
 
 use Moo;
 use JSON;
@@ -17,3 +18,20 @@ sub BUILD {
 }
 
 1;
+
+=head1 SUPPORT
+
+IRC
+
+  Join #web-simple on irc.perl.org. Highlight Getty for fast reaction :).
+
+Repository
+
+  http://github.com/Getty/p5-yeb
+  Pull request and additional contributors are welcome
+ 
+Issue Tracker
+
+  http://github.com/Getty/p5-yeb/issues
+
+
