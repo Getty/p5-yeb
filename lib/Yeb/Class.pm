@@ -52,6 +52,12 @@ has yeb_class_functions => (
 	},
 );
 
+sub call {
+	my ( $self, $func, @args ) = @_;
+	return $self->yeb_class_functions->{$func}->(@_) if defined $self->yeb_class_functions->{$func};
+	return $self->app->call($func,@args);
+}
+
 sub BUILD {
 	my ( $self ) = @_;
 

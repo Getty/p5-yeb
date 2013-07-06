@@ -142,6 +142,13 @@ has yeb_functions => (
 	},
 );
 
+sub call {
+	my ( $self, $func, @args ) = @_;
+	return $self->functions->{$func}->(@_) if defined $self->functions->{$func};
+	return $self->yeb_functions->{$func}->(@_) if defined $self->yeb_functions->{$func};
+	croak "Unknown function ".$func." inside ".(ref $self)." application";
+}
+
 sub class_loader {
 	my ( $self, $class ) = @_;
 	if ($class =~ m/^\+/) {

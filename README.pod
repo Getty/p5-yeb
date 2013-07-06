@@ -1,12 +1,19 @@
-=pod
+=head1 Yeb - Yet another webframework
 
-=head1 NAME
+B<ALPHA SOFTWARE>
 
-yeb
+=head2 INSTALLATION
 
-=head1 VERSION
+After checking out, you require to install the requirements. You must have
+installed B<Dist::Zilla>, then you can do the following to install the base
+Perl requirements:
 
-version 0.003
+  dzil authordeps --missing | cpanm
+  dzil listdeps --missing | cpanm
+
+You can also just install the release via cpan:
+
+  cpanm Yeb
 
 =head1 SUPPORT
 
