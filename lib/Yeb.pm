@@ -18,6 +18,12 @@ sub import { shift;
 
 =encoding utf8
 
+=head1 WARNING
+
+B<ALPHA> This web framework is made to be used for B<YACT>, a new version of
+the Act conference system. With the release of B<YACT> the API will be
+stabilized. B<ALPHA>
+
 =head1 SYNOPSIS
 
   package MyApp::Web;
@@ -66,9 +72,16 @@ sub import { shift;
 
 Can then be started like (see L<Web::Simple>):
 
-  plackup -MMyApp::Web -e'MyApp::Web->run_if_script'
+  plackup -Ilib -MMyApp::Web -e'MyApp::Web->run_if_script'
 
-Or a L<Text::Xslate> example:
+or use the B<yeb> CLI tool which automatically also loads up B<./lib> as path
+for easy handling:
+
+  yeb MyApp::Web
+
+Additional parameters get dispatched towards L<plackup>
+
+Bigger L<Text::Xslate> example:
 
   package MyApp::WebXslate;
 
