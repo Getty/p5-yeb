@@ -11,6 +11,7 @@ use Path::Tiny qw( path );
 use Plack::Middleware::Debug;
 use List::Util qw( reduce );
 use Hash::Merge qw( merge );
+use Carp;
 
 use Web::Simple ();
 
