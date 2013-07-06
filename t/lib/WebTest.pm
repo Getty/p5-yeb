@@ -10,19 +10,24 @@ r "/" => sub {
 };
 
 r "/a/..." => sub {
-	ex( [qw( x y )] => 'export a' );
+	ex( [qw( x y )], 'export a' );
 	st( [qw( y x )] => 'stash a' );
-	st( [qw( a )] => 'single b a' );
-	st( c => 'single c a' );
+	st [qw( a )] => 'single b a';
+	st c => 'single c a';
 	chain 'Bla';
 };
 
 r "/b/..." => sub {
-	ex( [qw( x y )] => 'export b' );
+	ex [qw( x y )] => 'export b';
 	st( [qw( y x )] => 'stash b' );
 	st( [qw( a )] => 'single a b' );
-	st( c => 'single c b' );
+	st 'c', 'single c b';
 	chain 'Bla';
+};
+
+r "/other/..." => sub {
+	ex other_app => 'other';
+	chain '+OtherWebTest';
 };
 
 1;

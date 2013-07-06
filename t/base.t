@@ -24,6 +24,8 @@ my @tests = (
 	[ 'robots.txt', 'robots.txt' ],
 	[ 'js/test.js', 'js/test.js' ],
 	[ 'subdir/test.js', 'subdir/test.js' ],
+	[ 'other/other', 'other and other', 200 ],
+	[ 'other/', 'other root', 200 ],
 );
 
 for (@tests) {

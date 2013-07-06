@@ -28,12 +28,14 @@ SKIP: {
 		[ '', qr!index page_include\[page\[root\]\]! ],
 		[ 'test', qr!index/test page_include\[page\[test\]\]! ],
 		[ 'images/notfound', undef, 404 ],
-		#[ 'images/test.jpg', path($Bin,'htdocs','images','test.jpg')->slurp, 200 ],
+		[ 'images/test.jpg', path($Bin,'htdocs','images','test.jpg')->slurp, 200 ],
 		[ 'robots.txt', 'robots.txt' ],
 		[ 'js/test.js', 'js/test.js' ],
 		[ 'subdir/test.js', 'subdir/test.js' ],
 		[ 'no_default_handler_error', qr/i am out of here/, 500 ],
 		[ 'json', { key => 'value', other_key => 'value' } ],
+		[ 'other/other', 'other and xslate', 200 ],
+		[ 'other/', 'other root', 200 ],
 	);
 
 	for (@tests) {

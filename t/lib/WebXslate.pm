@@ -32,7 +32,7 @@ r "/json" => sub {
 };
 
 r "/other/..." => sub {
-	ex other_app => 'other';
+	ex other_app => 'xslate';
 	chain '+OtherWebTest';
 };
 
