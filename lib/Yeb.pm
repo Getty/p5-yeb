@@ -105,7 +105,7 @@ Bigger L<Text::Xslate> example:
   };
 
   r "/test" => sub {
-    st->{page} = 'test';
+    st page => 'test';
     xslate 'index/test', { extra_var => 'extra' };
   };
 
