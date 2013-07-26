@@ -26,14 +26,23 @@ my @tests = (
 	[ 'subdir/test.js', 'subdir/test.js' ],
 	[ 'other/other', 'other and other', 200 ],
 	[ 'other/', 'other root', 200 ],
+	[ 'post', 'stash post ""' ],
+	[ [], 'post', 'stash post "test"' ],
+	[ 'postparam', 'paramstash post ""' ],
+	[ [ testparam => 1 ], 'postparam', 'paramstash post "1"' ],
 );
 
 for (@tests) {
-	my $path = $_->[0];
+	my $post;
+	if (ref $_->[0] eq 'ARRAY') {
+		$post = shift @{$_};
+	}
+	my $path = shift @{$_};
 	my $url = "http://localhost/".$path;
-	my $test = $_->[1];
-	my $code = defined $_->[2] ? $_->[2] : 200;
-	ok(my $res = $app->run_test_request( GET => $url ), 'response on /'.$path);
+	my $test = shift @{$_};
+	my $want_code = shift @{$_};
+	my $code = defined $want_code ? $want_code : 200;
+	ok(my $res = $app->run_test_request( $post ? 'POST' : 'GET', $url, $post ? ($post) : () ), 'response on /'.$path);
 	cmp_ok($res->code, '==', $code, 'Status '.$code.' on /'.$path);
 	if (ref $test eq 'Regexp') {
 		like($res->content, $test, 'Expected content on /'.$path);

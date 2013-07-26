@@ -9,6 +9,18 @@ r "/" => sub {
 	text "root";
 };
 
+pr "/post" => sub {
+	st post => "test";
+}, sub {
+	text 'stash post "'.st("post").'"';
+};
+
+pr "/postparam" => "%testparam~" => sub {
+	st posttestparam => shift;
+}, sub {
+	text 'paramstash post "'.st("posttestparam").'"';
+};
+
 r "/a/..." => sub {
 	ex( [qw( x y )], 'export a' );
 	st( [qw( y x )] => 'stash a' );

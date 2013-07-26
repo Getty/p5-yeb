@@ -110,10 +110,11 @@ has yeb_functions => (
 
 			chain => sub {
 				my $class = $self->class_loader(shift);
-				$class->yeb->y($class)->chain;
+				return $class->yeb->y($class)->chain;
 			},
 			load => sub {
 				my $class = $self->class_loader(shift);
+				return;
 			},
 
 			cfg => sub { $self->config },
@@ -123,8 +124,10 @@ has yeb_functions => (
 			cc => sub { $self->cc },
 			env => sub { $self->cc->env },
 			req => sub { $self->cc->request },
-			st => sub { $self->hash_accessor($self->cc->stash,@_) },
-			ex => sub { $self->hash_accessor($self->cc->export,@_) },
+			st => sub { $self->hash_accessor_empty($self->cc->stash,@_) },
+			st_has => sub { $self->hash_accessor_has($self->cc->stash,@_) },
+			ex => sub { $self->hash_accessor_empty($self->cc->export,@_) },
+			ex_has => sub { $self->hash_accessor_has($self->cc->export,@_) },
 			pa => sub { $self->hash_accessor_empty($self->cc->request->params,@_) },
 			pa_has => sub { $self->hash_accessor_has($self->cc->request->params,@_) },
 

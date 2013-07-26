@@ -43,7 +43,28 @@ has yeb_class_functions => (
 		{
 			plugin => sub { $self->app->add_plugin($self->class,@_) },
 
-			r => sub { $self->add_to_chain(@_) },
+			r => sub { $self->add_to_chain(@_); return; },
+			route => sub { $self->yeb_class_functions->{'r'}->(@_) },
+
+			pr => sub {
+				my $route = shift;
+				my $post_route;
+				if (ref $_[0] eq 'CODE') {
+					$post_route = "POST";
+				} else {
+					$post_route = "POST + ".(shift);
+				}
+				my $post_func = shift;
+				my @args = @_;
+				$self->add_to_chain($route, sub {
+					return $post_route, sub {
+						shift; $post_func->(@_); return;
+					}, @args;
+				});
+				return;
+			},
+			post_route => sub { $self->yeb_class_functions->{'pr'}->(@_) },
+
 			middleware => sub {
 				my $middleware = shift;
 				$self->prepend_to_chain( "" => sub { $middleware } );
