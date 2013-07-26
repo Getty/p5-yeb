@@ -130,7 +130,7 @@ has yeb_functions => (
 
 			text => sub {
 				$self->cc->content_type('text/plain');
-				$self->cc->body(@_);
+				$self->cc->body(join(" ",@_));
 				$self->cc->response;
 			},
 
