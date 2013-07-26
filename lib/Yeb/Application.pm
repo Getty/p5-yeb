@@ -122,7 +122,7 @@ has yeb_functions => (
 
 			cc => sub { $self->cc },
 			env => sub { $self->cc->env },
-			req => sub { $self->cc->req },
+			req => sub { $self->cc->request },
 			st => sub { $self->hash_accessor($self->cc->stash,@_) },
 			ex => sub { $self->hash_accessor($self->cc->export,@_) },
 			pa => sub { $self->hash_accessor_empty($self->cc->request->params,@_) },
