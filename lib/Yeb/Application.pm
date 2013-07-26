@@ -136,7 +136,7 @@ has yeb_functions => (
 
 			html_body => sub {
 				$self->cc->content_type('text/html');
-				$self->cc->body('<html><body>'.@_.'</body></html>');
+				$self->cc->body('<html><body>'.join(" ",@_).'</body></html>');
 				$self->cc->response;
 			},
 		}
