@@ -30,8 +30,16 @@ has header => (
 has request => (
 	is => 'ro',
 	lazy => 1,
-	builder => sub { Plack::Request->new(shift->env) }
+	builder => sub { Plack::Request->new(shift->env) },
+	handles => [qw(
+		base
+	)],
 );
+sub url_base {
+	my ( $self ) = @_;
+	# TODO allow modifier here
+	$self->base;
+}
 
 has status => (
 	is => 'rw',

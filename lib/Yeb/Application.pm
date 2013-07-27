@@ -11,6 +11,9 @@ use Path::Tiny qw( path );
 use Plack::Middleware::Debug;
 use List::Util qw( reduce );
 use Hash::Merge qw( merge );
+use URL::Encode qw( url_encode_utf8 );
+use List::MoreUtils qw(any);
+
 use Carp;
 
 use Web::Simple ();
@@ -131,6 +134,28 @@ has yeb_functions => (
 			pa => sub { $self->hash_accessor_empty($self->cc->request->params,@_) },
 			pa_has => sub { $self->hash_accessor_has($self->cc->request->params,@_) },
 
+			url => sub {
+				my @parts = $self->flat(@_);
+				my ( @path_parts, @hashs );
+				for (@parts) {
+					if (ref $_ eq 'HASH') {
+						push @hashs, $_;
+					} else {
+						push @path_parts, $_;
+					}
+				}
+				my $url = $self->cc->url_base;
+				if (@path_parts) {
+					$url .= join("/",map { url_encode_utf8($_) } @path_parts);
+				}
+				if (@hashs) {
+					$url .= '?';
+					my $gets = $self->merge_hashs(reverse @hashs);
+					$url .= join("&",map { $_.'='.url_encode_utf8($gets->{$_}) } keys %{$gets});
+				}
+				return $url;
+			},
+
 			text => sub {
 				$self->cc->content_type('text/plain');
 				$self->cc->body(join(" ",@_));
@@ -212,16 +237,6 @@ sub add_middleware {
 	$self->y_main->prepend_to_chain( "" => sub { $middleware } );
 }
 
-sub merge_hashs {
-	my ( $self, @hashs ) = @_;
-	my $first = pop @hashs;
-	while (@hashs) {
-		my $next = pop @hashs;
-		$first = merge($first,$next);
-	}
-	return $first;
-}
-
 sub BUILD {
 	my ( $self ) = @_;
 
@@ -282,6 +297,28 @@ sub register_function {
 	for (keys %{$self->yebs}) {
 		$self->y($_)->add_function($func,$coderef);
 	}
+}
+
+sub flat {
+	my ( $self, $list, @seen_lists ) = @_;
+	if (ref $list ne 'ARRAY') {
+	  return $list;
+	} elsif (any { $_ == $list } @seen_lists) {
+	  return;
+	} else {
+	  push @seen_lists, $list;
+	  return map { $self->flat($_, @seen_lists) } @{$list};
+	}
+}
+
+sub merge_hashs {
+	my ( $self, @hashs ) = @_;
+	my $first = pop @hashs;
+	while (@hashs) {
+		my $next = pop @hashs;
+		$first = merge($first,$next);
+	}
+	return $first;
 }
 
 1;
