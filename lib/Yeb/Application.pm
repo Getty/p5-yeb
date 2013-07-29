@@ -127,6 +127,7 @@ has yeb_functions => (
 			cc => sub { $self->cc },
 			env => sub { $self->cc->env },
 			req => sub { $self->cc->request },
+			uri_for => sub { $self->cc->uri_for(@_) },
 			st => sub { $self->hash_accessor_empty($self->cc->stash,@_) },
 			st_has => sub { $self->hash_accessor_has($self->cc->stash,@_) },
 			ex => sub { $self->hash_accessor_empty($self->cc->export,@_) },
@@ -158,7 +159,7 @@ has yeb_functions => (
 
 			text => sub {
 				$self->cc->content_type('text/plain');
-				$self->cc->body(join(" ",@_));
+				$self->cc->body(join("\n",@_));
 				$self->cc->response;
 			},
 
@@ -248,6 +249,13 @@ sub BUILD {
 	$self->package_stash->add_symbol('$yeb',\$self);
 	
 	Web::Simple->import::into($self->class);
+
+	$self->package_stash->add_symbol('&register_has',sub {
+		my ( $attr, @args ) = @_;
+		my @attrs = ref $attr eq 'ARRAY' ? @{$attr} : ($attr);
+		$self->register_function($_, $self->class->can($_)) for @attrs;
+		$self->class->can('has')->($attr, @args);
+	});
 	
 	$self->package_stash->add_symbol('&dispatch_request',sub {
 		my ( undef, $env ) = @_;
@@ -263,9 +271,9 @@ sub BUILD {
 	$self->yeb_import($self->class);
 
 	$self->package_stash->add_symbol('&import',sub {
-		my ( $class, $alias ) = @_;
+		my ( $class ) = @_;
 		my $target = caller;
-		$self->yeb_import($target, $alias);
+		$self->yeb_import($target);
 	});
 
 	if ($self->debug) {

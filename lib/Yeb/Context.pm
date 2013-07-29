@@ -3,6 +3,7 @@ package Yeb::Context;
 
 use Moo;
 use Plack::Request;
+use URI;
 
 has env => (
 	is => 'ro',
@@ -35,10 +36,19 @@ has request => (
 		base
 	)],
 );
-sub url_base {
-	my ( $self ) = @_;
-	# TODO allow modifier here
-	$self->base;
+
+has uri_base => (
+	is => 'rw',
+	lazy => 1,
+	builder => sub { shift->req->base },
+);
+
+sub uri_for { # TODO supporting several args and hash as args
+	my($self, $path, $args) = @_;
+	my $uri = $self->uri_base;
+	$uri->path($uri->path . $path);
+	$uri->query_form(@$args) if $args;
+	$uri;
 }
 
 has status => (
