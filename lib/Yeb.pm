@@ -1,5 +1,5 @@
 package Yeb;
-# ABSTRACT: Yep! Yeb is for web! Yep Yep!
+# ABSTRACT: A simple structure for Web::Simple applications
 
 use strict;
 use warnings;
