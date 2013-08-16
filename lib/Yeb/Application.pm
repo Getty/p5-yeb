@@ -132,8 +132,8 @@ has yeb_functions => (
 			st_has => sub { $self->hash_accessor_has($self->cc->stash,@_) },
 			ex => sub { $self->hash_accessor_empty($self->cc->export,@_) },
 			ex_has => sub { $self->hash_accessor_has($self->cc->export,@_) },
-			pa => sub { $self->hash_accessor_empty($self->cc->request->params,@_) },
-			pa_has => sub { $self->hash_accessor_has($self->cc->request->params,@_) },
+			pa => sub { $self->hash_accessor_empty($self->cc->request->parameters,@_) },
+			pa_has => sub { $self->hash_accessor_has($self->cc->request->parameters,@_) },
 
 			url => sub {
 				my @parts = $self->flat(@_);
