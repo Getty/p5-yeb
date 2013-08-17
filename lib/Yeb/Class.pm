@@ -46,6 +46,14 @@ has yeb_class_functions => (
 			r => sub { $self->add_to_chain(@_); return; },
 			route => sub { $self->yeb_class_functions->{'r'}->(@_) },
 
+			nop => sub (&) {
+				my ( $code ) = @_;
+				return sub {
+					$code->(@_);
+					return;
+				};
+			},
+
 			pr => sub {
 				my $route = shift;
 				my $post_route;

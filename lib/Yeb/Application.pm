@@ -13,6 +13,7 @@ use List::Util qw( reduce );
 use Hash::Merge qw( merge );
 use URL::Encode qw( url_encode_utf8 );
 use List::MoreUtils qw(any);
+use Sys::Hostname;
 
 use Carp;
 
@@ -129,6 +130,7 @@ has yeb_functions => (
 			cfg => sub { $self->config },
 			root => sub { path($self->root,@_) },
 			cur => sub { path($self->current_dir,@_) },
+			hostname => sub { hostname() },
 
 			cc => sub { $self->cc },
 			env => sub { $self->hash_accessor($self->cc->env,@_) },
