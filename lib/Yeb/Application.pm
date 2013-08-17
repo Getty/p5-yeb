@@ -25,6 +25,10 @@ has class => (
 	required => 1,
 );
 
+has app => (
+	is => 'rw',
+);
+
 has first => (
 	is => 'ro',
 	lazy => 1,
@@ -111,6 +115,8 @@ has yeb_functions => (
 		{
 			yeb => sub { $self },
 
+			app => sub { $self->app },
+
 			chain => sub {
 				my $class = $self->class_loader(shift);
 				return $class->yeb->y($class)->chain;
@@ -125,7 +131,7 @@ has yeb_functions => (
 			cur => sub { path($self->current_dir,@_) },
 
 			cc => sub { $self->cc },
-			env => sub { $self->cc->env },
+			env => sub { $self->hash_accessor($self->cc->env,@_) },
 			req => sub { $self->cc->request },
 			uri_for => sub { $self->cc->uri_for(@_) },
 			st => sub { $self->hash_accessor_empty($self->cc->stash,@_) },
@@ -258,7 +264,8 @@ sub BUILD {
 	});
 	
 	$self->package_stash->add_symbol('&dispatch_request',sub {
-		my ( undef, $env ) = @_;
+		my ( $app, $env ) = @_;
+		$self->app($app);
 		$self->reset_context;
 		$self->set_cc(Yeb::Context->new( env => $env ));
 		return $self->y_main->chain,
