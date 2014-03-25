@@ -1,8 +1,6 @@
 package WebTest;
 
-use Yeb;
-
-plugin 'Static';
+use Yeb qw( Static );
 load 'Static';
 
 r "/" => sub {

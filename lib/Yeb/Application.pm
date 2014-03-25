@@ -144,7 +144,7 @@ has yeb_functions => (
 			pa_has => sub { $self->hash_accessor_has($self->cc->request->parameters,@_) },
 
 			url => sub {
-				my @parts = $self->flat(@_);
+				my @parts = $self->flat([@_]);
 				my ( @path_parts, @hashs );
 				for (@parts) {
 					if (ref $_ eq 'HASH') {
@@ -298,6 +298,15 @@ sub BUILD {
 
 	if ($self->debug) {
 		$self->add_middleware(Plack::Middleware::Debug->new);
+	}
+
+	my @args = @{$self->args};
+
+	while (@args) {
+		my $plugin = shift @args;
+		my $plugin_args = ref $args[0] eq 'HASH'
+			? shift @args : {};
+		$self->add_plugin($self->class,$plugin,%{$plugin_args});
 	}
 }
 
