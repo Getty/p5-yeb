@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: yeb
+# ABSTRACT: Executable to start your Yeb class directly
 
 use strict;
 use warnings;
