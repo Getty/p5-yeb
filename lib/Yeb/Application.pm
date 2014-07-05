@@ -165,16 +165,21 @@ has yeb_functions => (
 				return $url;
 			},
 
-			redirect => sub {
-				$self->cc->header->{'Location'} = $_[0];
-				$self->cc->content_type('text/html');
-				$self->cc->body('<html><head><meta http-equiv="refresh" content="0; url='.$_[0].'" /></head><body></body></html>');
-				$self->cc->response;
-			},
-
 			text => sub {
 				$self->cc->content_type('text/plain');
 				$self->cc->body(join("\n",@_));
+				$self->cc->response;
+			},
+
+			redirect => sub {
+				my ( $target, $code ) = shift;
+				$code = 307 unless $code;
+				$self->cc->content_type('text/html');
+				$self->cc->header->{location} = $target;
+				$self->cc->body(<<"__REDIRECT__");
+<html><head><title>Moved</title><meta http-equiv="refresh" content="0; url=$target"></head>
+<body><h1>Moved</h1><p>This page has moved to <a href="$target">$target</a>.</p></body></html>
+__REDIRECT__
 				$self->cc->response;
 			},
 
