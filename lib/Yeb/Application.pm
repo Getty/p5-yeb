@@ -305,7 +305,7 @@ sub BUILD {
 		$self->add_middleware(Plack::Middleware::Debug->new);
 	}
 
-	my @args = @{$self->args};
+	my @args = $self->has_args ? ( @{$self->args} ) : ();
 
 	while (@args) {
 		my $plugin = shift @args;
