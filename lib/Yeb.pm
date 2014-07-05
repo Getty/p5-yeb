@@ -18,13 +18,11 @@ sub import { shift;
 
 =encoding utf8
 
-=head1 WARNING
+=head1 WARNING / ALPHA
 
-B<ALPHA>
-This web framework is made to be used for B<YACT>, a new version of
-the Act conference system. I also use it already in own projects, which
-should assure more stability. Please contact me, if you want to use it.
-B<ALPHA>
+B<WARNING:> I don't advice using it without staying in contact with me
+(B<Getty>) at B<#sycontent> on B<irc.perl.org>. While the core API will stay
+stable, the way how to extend the system will change with the time.
 
 =head1 SYNOPSIS
 
@@ -205,7 +203,7 @@ Overview of all approved plugins
 
 IRC
 
-  Join #web-simple on irc.perl.org. Highlight Getty for fast reaction :).
+  Join #sycontent on irc.perl.org. Highlight Getty for fast reaction :).
 
 Repository
 
