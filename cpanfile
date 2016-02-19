@@ -1,7 +1,7 @@
 
 requires 'Web::Simple', '0';
 requires 'Import::Into', '0';
-requires 'Class::Load', '0';
+requires 'Module::Runtime', '0';
 requires 'Plack', '0';
 requires 'Package::Stash', '0';
 requires 'Path::Tiny', '0';

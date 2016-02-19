@@ -3,8 +3,6 @@ package Yeb::Class;
 
 use Moo;
 use Package::Stash;
-use Class::Load ':all';
-use Path::Tiny qw( path );
 
 has app => (
 	is => 'ro',

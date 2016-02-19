@@ -6,7 +6,7 @@ use Package::Stash;
 use Import::Into;
 use Yeb::Context;
 use Yeb::Class;
-use Class::Load ':all';
+use Module::Runtime qw( use_module );
 use Path::Tiny qw( path );
 use Plack::Middleware::Debug;
 use List::Util qw( reduce );
@@ -206,7 +206,7 @@ sub class_loader {
 	} else {
 		$class = $self->class.'::'.$class;
 	}
-	load_class($class) unless is_class_loaded($class);
+	use_module($class);
 	return $class;
 }
 
@@ -248,7 +248,7 @@ sub add_plugin {
 	} else {
 		$class = 'Yeb::Plugin::'.$plugin;
 	}
-	load_class($class);
+	use_module($class);
 	my $obj = $class->new( app => $self, class => $self->y($source) , %args );
 	push @{$self->plugins}, $obj;
 }
