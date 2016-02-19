@@ -21,7 +21,7 @@ sub import { shift;
 =head1 WARNING / ALPHA
 
 B<WARNING:> I don't advice using it without staying in contact with me
-(B<Getty>) at B<#sycontent> on B<irc.perl.org>. While the core API will stay
+(B<Getty>) at B<#web-simple> on B<irc.perl.org>. While the core API will stay
 stable, the way how to extend the system will change with the time.
 
 =head1 SYNOPSIS
@@ -203,7 +203,7 @@ Overview of all approved plugins
 
 IRC
 
-  Join #sycontent on irc.perl.org. Highlight Getty for fast reaction :).
+  Join #web-simple on irc.perl.org. Highlight Getty for fast reaction :).
 
 Repository
 
