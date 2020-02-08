@@ -9,6 +9,8 @@ requires 'Plack::Middleware::Debug', '0';
 requires 'Hash::Merge', '0';
 requires 'List::MoreUtils', '0';
 requires 'URL::Encode', '0';
+requires 'Moo', '0';
+requires 'URI', '0';
 
 on test => sub {
   requires 'Test::More', '0.96';
